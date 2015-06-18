@@ -138,20 +138,21 @@
    spacebars-font-lock-keywords-2
    `(
      (,(rx "{{" (* whitespace)
+           (group "else")
+           (* whitespace) "}}")
+      (1 font-lock-keyword-face))
+
+     (,(rx "{{" (* whitespace)
            (group
-            (*? anything))
-           (* (* whitespace) (*? anything)) "}}")
+            (*? word))
+           (* (+ whitespace) (*? anything))
+           (* whitespace) "}}")
       (1 font-lock-variable-name-face))
 
      ;; (,(rx  (group (word) "=" (* whitespace))
      ;;        (group (word)))
      ;;  (1 font-lock-keyword-face t)
      ;;  (2 font-lock-warning-face t))
-
-     (,(rx "{{" (* whitespace)
-           (group "else")
-           (* whitespace) "}}")
-      (1 font-lock-keyword-face))
 
      (,(rx
           "{{" (or "#" "/") (* whitespace)
@@ -175,6 +176,13 @@
         (group "{{" (? (or ">" "#" "/")))
         (*? anything)
         (group "}}"))
+      (1 font-lock-type-face)
+      (2 font-lock-type-face))
+
+     (,(rx
+        (group "{{{")
+        (*? anything)
+        (group "}}}"))
       (1 font-lock-type-face)
       (2 font-lock-type-face))
 
