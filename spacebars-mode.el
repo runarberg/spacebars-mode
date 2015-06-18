@@ -56,6 +56,9 @@
    spacebars-user-keywords
    '("if" "unless" "each" "with")))
 
+(defun spacebars-closing-keywords ()
+  (spacebars-builtin-keywords))
+
 (defun spacebars-indenting-keywords ()
   (append
    (spacebars-closing-keywords)
@@ -82,43 +85,32 @@
       (error "Nothing to close")))
   (save-excursion (spacebars-indent-line)))
 
-(defvar spacebars-insert-block-history nil)
-(defun spacebars-insert-block (tag-name)
+(define-skeleton spacebars-insert-block
   "Insert an open and closing block tags"
-  (interactive
-   (list
-    (read-from-minibuffer
-     "Block name: " (car spacebars-insert-block-history)
-     nil nil 'spacebars-insert-block-history)))
-  (insert (concat "{{#" tag-name "}}\n"))
-  (spacebars-indent-line)
-  (save-excursion
-    (insert (concat "\n{{/" tag-name "}}"))
-    (spacebars-indent-line)))
+  ""
+  > "{{#" (setq name (skeleton-read "Block name: "))
+  (if (member name (spacebars-builtin-keywords))
+      (concat " " (skeleton-read (concat name " ")))
+    "")
+  "}}" \n
+  _ \n
+  "{{/" name "}}" >)
 
-(defun spacebars-insert-tag ()
+(define-skeleton spacebars-insert-tag
   "Insert a double braced tag"
-  (interactive)
-  (insert "{{")
-  (save-excursion
-    (insert "}}")
-    (spacebars-indent-line)))
+  ""
+  "{{" _ "}}")
 
-(defun spacebars-insert-inclution ()
+(define-skeleton spacebars-insert-inclution
   "Insert an inclution tag"
-  (interactive)
-  (insert "{{>")
-  (save-excursion
-    (insert "}}")
-    (spacebars-indent-line)))
+  ""
+  "{{>" _ "}}")
 
-(defun spacebars-insert-comment ()
+
+(define-skeleton spacebars-insert-comment
   "Insert a comment tag"
-  (interactive)
-  (insert "{{!-- ")
-  (save-excursion
-    (insert " --}}")
-    (spacebars-indent-line)))
+  ""
+  "{{!--" _ "--}}")
 
 (defconst spacebars-font-lock-comments
   `(
@@ -298,11 +290,11 @@
           . sgml-font-lock-syntactic-keywords)))
   (set (make-local-variable 'indent-line-function) 'spacebars-indent-line))
 
-(define-key spacebars-mode-map (kbd "C-c t") 'spacebars-insert-tag)
-(define-key spacebars-mode-map (kbd "C-c b") 'spacebars-insert-block)
-(define-key spacebars-mode-map (kbd "C-c c") 'spacebars-close-block)
-(define-key spacebars-mode-map (kbd "C-c i") 'spacebars-insert-inclution)
-(define-key spacebars-mode-map (kbd "C-c #") 'spacebars-insert-comment)
+(define-key spacebars-mode-map (kbd "C-c C-c t") 'spacebars-insert-tag)
+(define-key spacebars-mode-map (kbd "C-c C-c b") 'spacebars-insert-block)
+(define-key spacebars-mode-map (kbd "C-c C-c /") 'spacebars-close-block)
+(define-key spacebars-mode-map (kbd "C-c C-c >") 'spacebars-insert-inclution)
+(define-key spacebars-mode-map (kbd "C-c C-c !") 'spacebars-insert-comment)
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.spacebars\\'" . spacebars-mode))
