@@ -143,8 +143,9 @@
       (1 font-lock-keyword-face))
 
      (,(rx "{{" (* whitespace)
+           (? (or ">") (* whitespace))
            (group
-            (*? word))
+            (*? (or word "." "$" "_")))
            (* (+ whitespace) (*? anything))
            (* whitespace) "}}")
       (1 font-lock-variable-name-face))
@@ -155,7 +156,7 @@
      ;;  (2 font-lock-warning-face t))
 
      (,(rx
-          "{{" (or "#" "/") (* whitespace)
+          "{{" (* whitespace) (or "#" "/") (* whitespace)
           (group
            (eval
             (append '(or)
@@ -164,8 +165,7 @@
           (* whitespace) "}}")
       (1 font-lock-keyword-face))
 
-     (,(rx "{{" (or "#" "/")
-           (* whitespace)
+     (,(rx "{{" (* whitespace) (or "#" "/") (* whitespace)
            (group
             (*? word))
            (* whitespace)
@@ -173,16 +173,16 @@
       (1 font-lock-function-name-face))
 
      (,(rx
-        (group "{{" (? (or ">" "#" "/")))
+        (group "{{{")
         (*? anything)
-        (group "}}"))
+        (group "}}}"))
       (1 font-lock-type-face)
       (2 font-lock-type-face))
 
      (,(rx
-        (group "{{{")
+        (group "{{" (? (* whitespace) (or ">" "#" "/")))
         (*? anything)
-        (group "}}}"))
+        (group "}}"))
       (1 font-lock-type-face)
       (2 font-lock-type-face))
 
