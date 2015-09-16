@@ -70,8 +70,8 @@
         `(and "{{#"
               (* whitespace)
               (group
-               (*? anything))
-              (* whitespace)
+               (*? (not whitespace)))
+              (* (and (+ whitespace) (* anything)))
               "}}")) nil t)
       (match-string 1)
     nil))
