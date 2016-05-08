@@ -54,7 +54,7 @@
 (defun spacebars-builtin-keywords ()
   (append
    spacebars-user-keywords
-   '("if" "unless" "each" "with")))
+   '("if" "unless" "each" "with" "let")))
 
 (defun spacebars-closing-keywords ()
   (spacebars-builtin-keywords))
@@ -71,8 +71,9 @@
               (* whitespace)
               (group
                (*? (not whitespace)))
-              (* (and (+ whitespace) (* anything)))
-              "}}")) nil t)
+              (* (+ whitespace) (* anything))
+              "}}"))
+       nil t)
       (match-string 1)
     nil))
 
@@ -88,13 +89,13 @@
 (define-skeleton spacebars-insert-block
   "Insert an open and closing block tags"
   ""
-  > "{{#" (setq name (skeleton-read "Block name: "))
+  "{{#" (setq name (skeleton-read "Block name: "))
   (if (member name (spacebars-builtin-keywords))
       (concat " " (skeleton-read (concat name " ")))
     "")
-  "}}" \n
-  _ \n
-  "{{/" name "}}" >)
+  "}}"
+  _
+  "{{/" name "}}")
 
 (define-skeleton spacebars-insert-tag
   "Insert a double braced tag"
@@ -161,15 +162,24 @@
            (eval
             (append '(or)
                     (spacebars-builtin-keywords))))
-          (* (* whitespace) (*? anything))
+          (* (+ whitespace) (*? anything))
           (* whitespace) "}}")
       (1 font-lock-keyword-face))
+
+     (,(rx "{{" (* whitespace) "#" (* whitespace)
+           "each" (+ whitespace)
+           (group (+ (or word "$" "_"))) (+ whitespace)
+           (group "in")
+           (+ whitespace) (+ (*? anything))
+           (* whitespace) "}}")
+      (1 font-lock-variable-name-face)
+      (2 font-lock-keyword-face))
 
      (,(rx "{{" (* whitespace) (or "#" "/") (* whitespace)
            (group
             (*? word))
-           (* whitespace)
-           "}}")
+           (* (+ whitespace) (*? anything))
+           (* whitespace) "}}")
       (1 font-lock-function-name-face))
 
      (,(rx
