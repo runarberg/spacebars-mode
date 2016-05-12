@@ -67,7 +67,7 @@
 (defun spacebars-find-open-tag ()
   (if (search-backward-regexp
        (rx-to-string
-        `(and "{{#"
+        `(and "{{" (* whitespace) "#"
               (* whitespace)
               (group
                (*? (not whitespace)))
@@ -246,11 +246,11 @@
   "Return indent column based on previous lines"
   (let ((indent-width sgml-basic-offset) (default (sgml-indent-line-num)))
     (forward-line -1)
-    (if (looking-at "^[ \t]*{{/") ; Don't indent after end
+    (if (looking-at "^[ \t]*{{[ \t]*/") ; Don't indent after end
         (current-indentation)
-      (if (looking-at "^[ \t]*{{# *.*?{{/ ")
+      (if (looking-at "^[ \t]*{{[ \t]*#[ \t]*.*}}{{[ \t]*/.*}}")
           (current-indentation)
-        (if (looking-at "^[ \t]*{{# *" ) ; Check start tag
+        (if (looking-at "^[ \t]*{{[ \t]*#" ) ; Check start tag
             (+ (current-indentation) indent-width)
           (if (looking-at "^[ \t]*<") ; Assume sgml block trust sgml
               default
@@ -264,11 +264,11 @@
   (if (bobp)  ; Check begining of buffer
       0
     (let ((indent-width sgml-basic-offset) (default (sgml-indent-line-num)))
-      (if (looking-at "^[ \t]*{{\\(/\\| *else\\)") ; Check close tag
+      (if (looking-at "^[ \t]*{{[ \t]*\\(/\\|else\\)") ; Check close tag
           (save-excursion
             (forward-line -1)
-            (if (and (looking-at "^[ \t]*{{#")
-                     (not (looking-at "^[ \t]*{{# *.*?{{/")))
+            (if (and (looking-at "^[ \t]*{{[ \t]*#")
+                     (not (looking-at "^[ \t]*{{[ \t]*#[ \t]*.*}}.*{{[ \t]*/.*}}")))
                 (current-indentation)
               (- (current-indentation) indent-width)))
         (if (looking-at "^[ \t]*</") ; Assume sgml end block trust sgml
