@@ -135,7 +135,6 @@
 
 (defconst spacebars-font-lock-keywords-3
   (append
-   spacebars-font-lock-keywords-1
    spacebars-font-lock-keywords-2
    `(
      (,(rx "{{" (* whitespace)
@@ -146,9 +145,9 @@
      (,(rx "{{" (* whitespace)
            (? (or ">") (* whitespace))
            (group
-            (*? (or word "." "$" "_")))
-           (* (+ whitespace) (*? anything))
-           (* whitespace) "}}")
+            alpha
+            (* (or word "." "$" "_")))
+           (*? anything) "}}")
       (1 font-lock-variable-name-face))
 
      ;; (,(rx  (group (word) "=" (* whitespace))
@@ -162,24 +161,20 @@
            (eval
             (append '(or)
                     (spacebars-builtin-keywords))))
-          (* (+ whitespace) (*? anything))
-          (* whitespace) "}}")
+          (*? anything) "}}")
       (1 font-lock-keyword-face))
 
      (,(rx "{{" (* whitespace) "#" (* whitespace)
            "each" (+ whitespace)
            (group (+ (or word "$" "_"))) (+ whitespace)
            (group "in")
-           (+ whitespace) (+ (*? anything))
-           (* whitespace) "}}")
+           (*? anything) "}}")
       (1 font-lock-variable-name-face)
       (2 font-lock-keyword-face))
 
      (,(rx "{{" (* whitespace) (or "#" "/") (* whitespace)
-           (group
-            (*? word))
-           (* (+ whitespace) (*? anything))
-           (* whitespace) "}}")
+           (group (+ word))
+           (*? anything) "}}")
       (1 font-lock-function-name-face))
 
      (,(rx
